@@ -23,16 +23,22 @@ Future work will focus on expanding ASR model support and improving local/offlin
 
 ## Planned ASR Work
 
-This patch starts with Apple Silicon friendly ASR options and keeps a set of planned presets visible in the model list before the runtime backends are wired in.
+This patch starts with Apple Silicon friendly ASR options. MLX presets are wired through the local `mlx-audio` Python/MLX backend, while GGUF entries remain visible as future CPU backend candidates.
 
 Current planned presets:
 
 - `Qwen/Qwen3-ASR-0.6B` and `Qwen/Qwen3-ASR-1.7B` as the official Hugging Face baselines
-- `mlx-community/Qwen3-ASR-0.6B-4bit`, `mlx-community/Qwen3-ASR-0.6B-8bit`, `mlx-community/Qwen3-ASR-1.7B-4bit`, and `mlx-community/Qwen3-ASR-1.7B-bf16` for MLX acceleration
+- `mlx-community/Qwen3-ASR-0.6B-4bit`, `mlx-community/Qwen3-ASR-0.6B-8bit`, `mlx-community/Qwen3-ASR-1.7B-4bit`, and `mlx-community/Qwen3-ASR-1.7B-bf16` for MLX acceleration through `mlx-audio`
 - `mlx-community/whisper-large-v3-turbo-asr-6bit` for MLX Whisper comparison work
 - `cstr/qwen3-asr-1.7b-GGUF` and `cstr/mimo-asr-GGUF` for future pure CPU or llama.cpp-style GGUF experiments
 
-The MLX and GGUF presets are roadmap entries right now. They are shown in the UI as planned models and cannot be selected, downloaded, or executed until the matching local backend is implemented.
+To run the MLX presets on Apple Silicon, install the local runtime first:
+
+```shell
+python3 -m pip install -U mlx-audio "huggingface_hub[hf_xet]"
+```
+
+The first transcription with a selected MLX model may download the model from Hugging Face. GGUF presets are shown in the UI as planned models and cannot be selected until a matching audio-capable GGUF backend is implemented.
 
 ## Build From Source
 

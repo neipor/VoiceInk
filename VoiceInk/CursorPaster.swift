@@ -59,7 +59,9 @@ class CursorPaster {
         if UserDefaults.standard.bool(forKey: "useAppleScriptPaste") {
             pasteUsingAppleScript()
         } else {
-            pasteFromClipboard()
+            if !pasteFromClipboard() {
+                pasteUsingAppleScript()
+            }
         }
     }
 
@@ -97,22 +99,26 @@ class CursorPaster {
         return (Unmanaged<CFString>.fromOpaque(nameRef).takeUnretainedValue() as String).hasSuffix("⌘")
     }
 
-    private static func pasteUsingAppleScript() {
+    @discardableResult
+    private static func pasteUsingAppleScript() -> Bool {
         let script = layoutSwitchesToQWERTYOnCommand ? pasteScriptKeyCode : pasteScriptKeystroke
         var error: NSDictionary?
         script?.executeAndReturnError(&error)
         if let error = error {
             logger.error("AppleScript paste failed: \(error, privacy: .public)")
+            return false
         }
+        return true
     }
 
     // MARK: - CGEvent paste
 
     // Posts Cmd+V via CGEvent without modifying the active input source.
-    private static func pasteFromClipboard() {
+    @discardableResult
+    private static func pasteFromClipboard() -> Bool {
         guard AXIsProcessTrusted() else {
             logger.error("Accessibility not trusted — cannot paste")
-            return
+            return false
         }
 
         let source = CGEventSource(stateID: .privateState)
@@ -132,6 +138,7 @@ class CursorPaster {
         cmdUp?.post(tap: .cghidEventTap)
 
         logger.notice("CGEvents posted for Cmd+V")
+        return true
     }
 
     // MARK: - Auto Send Keys

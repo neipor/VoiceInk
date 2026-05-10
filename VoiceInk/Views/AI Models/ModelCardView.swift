@@ -60,7 +60,12 @@ struct ModelCardView: View {
                 }
             case .huggingFaceASR, .mlxASR, .ggufASR:
                 if let plannedModel = model as? PlannedASRModel {
-                    PlannedASRModelCardView(model: plannedModel)
+                    PlannedASRModelCardView(
+                        model: plannedModel,
+                        isCurrent: isCurrent,
+                        isAvailable: transcriptionModelManager.isAvailableOnCurrentOS(plannedModel),
+                        setDefaultAction: setDefaultAction
+                    )
                 }
             case .custom:
                 if let customModel = model as? CustomCloudModel {
@@ -87,6 +92,9 @@ struct ModelCardView: View {
 
 struct PlannedASRModelCardView: View {
     let model: PlannedASRModel
+    let isCurrent: Bool
+    let isAvailable: Bool
+    var setDefaultAction: () -> Void
 
     var body: some View {
         HStack(alignment: .top, spacing: 16) {
@@ -96,12 +104,12 @@ struct PlannedASRModelCardView: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(Color(.labelColor))
 
-                    Text("Planned")
+                    Text(statusLabel)
                         .font(.system(size: 10, weight: .semibold))
-                        .foregroundColor(.orange)
+                        .foregroundColor(isAvailable ? .green : .orange)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 3)
-                        .background(Color.orange.opacity(0.12))
+                        .background((isAvailable ? Color.green : Color.orange).opacity(0.12))
                         .clipShape(Capsule())
 
                     Spacer()
@@ -132,15 +140,40 @@ struct PlannedASRModelCardView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
-            Text("Not wired")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(Color(.secondaryLabelColor))
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color.secondary.opacity(0.08))
-                .clipShape(Capsule())
+            actionSection
         }
         .padding(16)
-        .background(CardBackground(isSelected: false))
+        .background(CardBackground(isSelected: isCurrent, useAccentGradientWhenSelected: isCurrent))
+    }
+
+    private var statusLabel: String {
+        if model.provider == .mlxASR && isAvailable { return "MLX" }
+        return "Planned"
+    }
+
+    private var actionSection: some View {
+        HStack(spacing: 8) {
+            if isCurrent {
+                Text("Default Model")
+                    .font(.system(size: 12))
+                    .foregroundColor(Color(.secondaryLabelColor))
+            } else if model.provider == .mlxASR && isAvailable {
+                Button(action: setDefaultAction) {
+                    Text("Set as Default")
+                        .font(.system(size: 12))
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+                .help("Requires python3 and mlx-audio on this Mac")
+            } else {
+                Text("Not wired")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(Color(.secondaryLabelColor))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.secondary.opacity(0.08))
+                    .clipShape(Capsule())
+            }
+        }
     }
 }

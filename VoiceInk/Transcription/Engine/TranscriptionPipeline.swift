@@ -4,7 +4,7 @@ import SwiftData
 import os
 
 /// Handles the full post-recording pipeline:
-/// transcribe → filter → format → word-replace → prompt-detect → AI enhance → start paste + dismiss → save
+/// transcribe → filter → format → word-replace → prompt-detect → AI enhance → dismiss → paste → save
 @MainActor
 class TranscriptionPipeline {
     private let modelContext: ModelContext
@@ -35,7 +35,7 @@ class TranscriptionPipeline {
     ///   - onStateChange: Called when the pipeline moves to a new recording state (e.g. `.enhancing`).
     ///   - shouldCancel: Returns true if the user requested cancellation.
     ///   - onCleanup: Called when cancellation is detected to release model resources.
-    ///   - onDismiss: Called as soon as paste is initiated to dismiss the recorder panel.
+    ///   - onDismiss: Called before paste so the previous app can regain focus.
     func run(
         transcription: Transcription,
         audioURL: URL,
@@ -193,19 +193,16 @@ class TranscriptionPipeline {
             return
         }
 
-        let dismissTask: Task<Void, Never>?
-        if var textToPaste = finalPastedText,
+        if let textToPaste = finalPastedText,
            transcription.transcriptionStatus == TranscriptionStatus.completed.rawValue {
             let appendSpace = UserDefaults.standard.bool(forKey: "AppendTrailingSpace")
             let pastedText = textToPaste + (appendSpace ? " " : "")
-            let pastePostTask = CursorPaster.startPasteAtCursor(pastedText)
             SoundManager.shared.playStopSound()
             let autoSendKey = PowerModeManager.shared.currentActiveConfiguration?.autoSendKey
             await restorePromptDetectionSettingsIfNeeded()
-            dismissTask = Task { @MainActor in
-                await onDismiss()
-            }
-            await pastePostTask.value
+            await onDismiss()
+            try? await Task.sleep(nanoseconds: 120_000_000)
+            await CursorPaster.pasteAtCursorAndWaitUntilPosted(pastedText)
 
             if let autoSendKey, autoSendKey.isEnabled {
                 Task { @MainActor in
@@ -216,11 +213,8 @@ class TranscriptionPipeline {
         } else {
             await restorePromptDetectionSettingsIfNeeded()
             await onDismiss()
-            dismissTask = nil
         }
 
         saveTranscriptionAndPostCompletion()
-
-        await dismissTask?.value
     }
 }
