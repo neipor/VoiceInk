@@ -23,11 +23,16 @@ Future work will focus on expanding ASR model support and improving local/offlin
 
 ## Planned ASR Work
 
-This patch will continue to explore and add support for more ASR model families, including:
+This patch starts with Apple Silicon friendly ASR options and keeps a set of planned presets visible in the model list before the runtime backends are wired in.
 
-- Qwen ASR models
-- MiMo ASR models
-- Other Hugging Face speech recognition models that can fit a practical macOS workflow
+Current planned presets:
+
+- `Qwen/Qwen3-ASR-0.6B` and `Qwen/Qwen3-ASR-1.7B` as the official Hugging Face baselines
+- `mlx-community/Qwen3-ASR-0.6B-4bit`, `mlx-community/Qwen3-ASR-0.6B-8bit`, `mlx-community/Qwen3-ASR-1.7B-4bit`, and `mlx-community/Qwen3-ASR-1.7B-bf16` for MLX acceleration
+- `mlx-community/whisper-large-v3-turbo-asr-6bit` for MLX Whisper comparison work
+- `cstr/qwen3-asr-1.7b-GGUF` and `cstr/mimo-asr-GGUF` for future pure CPU or llama.cpp-style GGUF experiments
+
+The MLX and GGUF presets are roadmap entries right now. They are shown in the UI as planned models and cannot be selected, downloaded, or executed until the matching local backend is implemented.
 
 ## Build From Source
 

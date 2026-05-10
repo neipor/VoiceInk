@@ -307,18 +307,20 @@ struct ModelManagementView: View {
         switch selectedFilter {
         case .recommended:
             return transcriptionModelManager.allAvailableModels.filter {
-                let recommendedNames = ["ggml-base.en", "parakeet-tdt-0.6b-v2", "ggml-large-v3-turbo-q5_0", "whisper-large-v3-turbo"]
+                let recommendedNames = ["ggml-base.en", "parakeet-tdt-0.6b-v2", "ggml-large-v3-turbo-q5_0", "mlx-community-qwen3-asr-0.6b-4bit", "mlx-community-qwen3-asr-1.7b-4bit"]
                 return recommendedNames.contains($0.name)
             }.sorted { model1, model2 in
-                let recommendedOrder = ["ggml-base.en", "parakeet-tdt-0.6b-v2", "ggml-large-v3-turbo-q5_0", "whisper-large-v3-turbo"]
+                let recommendedOrder = ["ggml-base.en", "parakeet-tdt-0.6b-v2", "ggml-large-v3-turbo-q5_0", "mlx-community-qwen3-asr-0.6b-4bit", "mlx-community-qwen3-asr-1.7b-4bit"]
                 let index1 = recommendedOrder.firstIndex(of: model1.name) ?? Int.max
                 let index2 = recommendedOrder.firstIndex(of: model2.name) ?? Int.max
                 return index1 < index2
             }
         case .local:
             return transcriptionModelManager.allAvailableModels.filter {
-                ($0.provider == .whisper || $0.provider == .nativeApple || $0.provider == .fluidAudio)
+                let isCurrentLocal = ($0.provider == .whisper || $0.provider == .nativeApple || $0.provider == .fluidAudio)
                     && transcriptionModelManager.isAvailableOnCurrentOS($0)
+                let isPlannedLocal = $0.provider == .huggingFaceASR || $0.provider == .mlxASR || $0.provider == .ggufASR
+                return isCurrentLocal || isPlannedLocal
             }
         case .cloud:
             return transcriptionModelManager.allAvailableModels.filter { CloudProviderRegistry.provider(for: $0.provider) != nil }

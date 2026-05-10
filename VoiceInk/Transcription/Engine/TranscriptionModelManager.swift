@@ -44,6 +44,8 @@ class TranscriptionModelManager: ObservableObject {
                 return fluidAudioModelManager?.isFluidAudioModelDownloaded(named: model.name) ?? false
             case .nativeApple:
                 if #available(macOS 26, *) { return true } else { return false }
+            case .huggingFaceASR, .mlxASR, .ggufASR:
+                return false
             case .custom:
                 return true
             default:
@@ -59,6 +61,8 @@ class TranscriptionModelManager: ObservableObject {
         switch model.provider {
         case .nativeApple:
             if #available(macOS 26, *) { return true } else { return false }
+        case .huggingFaceASR, .mlxASR, .ggufASR:
+            return false
         default:
             return true
         }
@@ -84,6 +88,14 @@ class TranscriptionModelManager: ObservableObject {
 
     func setDefaultTranscriptionModel(_ model: any TranscriptionModel) {
         guard isAvailableOnCurrentOS(model) else {
+            if model is PlannedASRModel {
+                NotificationManager.shared.showNotification(
+                    title: "\(model.displayName) is planned but not wired yet",
+                    type: .info
+                )
+                return
+            }
+
             NotificationManager.shared.showNotification(
                 title: "\(model.displayName) requires macOS 26 or later",
                 type: .error

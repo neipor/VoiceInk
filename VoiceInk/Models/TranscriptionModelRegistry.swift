@@ -41,6 +41,116 @@ enum TranscriptionModelRegistry {
                 supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .fluidAudio)
             ),
 
+            // Planned ASR presets. These are visible as roadmap entries only; runtime/download support is not wired yet.
+            PlannedASRModel(
+                name: "qwen3-asr-0.6b-official",
+                displayName: "Qwen3 ASR 0.6B",
+                description: "Official Hugging Face checkpoint reserved for a future Transformers/Core ML style backend.",
+                provider: .huggingFaceASR,
+                size: "0.9B params",
+                parameterCount: "0.6B",
+                precision: "Original",
+                repository: "Qwen/Qwen3-ASR-0.6B",
+                backend: "Hugging Face",
+                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .huggingFaceASR)
+            ),
+            PlannedASRModel(
+                name: "qwen3-asr-1.7b-official",
+                displayName: "Qwen3 ASR 1.7B",
+                description: "Official larger Qwen3 ASR checkpoint reserved for future high-accuracy local transcription.",
+                provider: .huggingFaceASR,
+                size: "2B params",
+                parameterCount: "1.7B",
+                precision: "Original",
+                repository: "Qwen/Qwen3-ASR-1.7B",
+                backend: "Hugging Face",
+                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .huggingFaceASR)
+            ),
+            PlannedASRModel(
+                name: "mlx-community-qwen3-asr-0.6b-4bit",
+                displayName: "Qwen3 ASR 0.6B MLX 4bit",
+                description: "Apple Silicon friendly MLX Community conversion; likely first target for low-memory MLX support.",
+                provider: .mlxASR,
+                size: "0.3B params",
+                parameterCount: "0.6B",
+                precision: "4bit",
+                repository: "mlx-community/Qwen3-ASR-0.6B-4bit",
+                backend: "MLX",
+                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .mlxASR)
+            ),
+            PlannedASRModel(
+                name: "mlx-community-qwen3-asr-0.6b-8bit",
+                displayName: "Qwen3 ASR 0.6B MLX 8bit",
+                description: "Higher precision MLX preset for a small Qwen3 ASR model on Apple Silicon.",
+                provider: .mlxASR,
+                size: "0.4B params",
+                parameterCount: "0.6B",
+                precision: "8bit",
+                repository: "mlx-community/Qwen3-ASR-0.6B-8bit",
+                backend: "MLX",
+                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .mlxASR)
+            ),
+            PlannedASRModel(
+                name: "mlx-community-qwen3-asr-1.7b-4bit",
+                displayName: "Qwen3 ASR 1.7B MLX 4bit",
+                description: "MLX Community 1.7B preset for balanced accuracy and Apple Silicon acceleration.",
+                provider: .mlxASR,
+                size: "0.6B params",
+                parameterCount: "1.7B",
+                precision: "4bit",
+                repository: "mlx-community/Qwen3-ASR-1.7B-4bit",
+                backend: "MLX",
+                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .mlxASR)
+            ),
+            PlannedASRModel(
+                name: "mlx-community-qwen3-asr-1.7b-bf16",
+                displayName: "Qwen3 ASR 1.7B MLX bf16",
+                description: "Fuller precision MLX preset for quality-focused local ASR experiments.",
+                provider: .mlxASR,
+                size: "2 GB",
+                parameterCount: "1.7B",
+                precision: "bf16",
+                repository: "mlx-community/Qwen3-ASR-1.7B-bf16",
+                backend: "MLX",
+                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .mlxASR)
+            ),
+            PlannedASRModel(
+                name: "mlx-community-whisper-large-v3-turbo-asr-6bit",
+                displayName: "Whisper Large v3 Turbo MLX 6bit",
+                description: "MLX Community Whisper ASR preset for comparing MLX audio pipelines with whisper.cpp.",
+                provider: .mlxASR,
+                size: "TBD",
+                parameterCount: "Large v3 Turbo",
+                precision: "6bit",
+                repository: "mlx-community/whisper-large-v3-turbo-asr-6bit",
+                backend: "MLX",
+                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .mlxASR)
+            ),
+            PlannedASRModel(
+                name: "cstr-qwen3-asr-1.7b-gguf",
+                displayName: "Qwen3 ASR 1.7B GGUF",
+                description: "GGUF preset for future pure CPU or llama.cpp-style backend experiments.",
+                provider: .ggufASR,
+                size: "2B params",
+                parameterCount: "1.7B",
+                precision: "GGUF",
+                repository: "cstr/qwen3-asr-1.7b-GGUF",
+                backend: "GGUF",
+                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .ggufASR)
+            ),
+            PlannedASRModel(
+                name: "cstr-mimo-asr-gguf",
+                displayName: "MiMo ASR GGUF",
+                description: "MiMo ASR GGUF candidate for future CPU-first transcription support.",
+                provider: .ggufASR,
+                size: "TBD",
+                parameterCount: "TBD",
+                precision: "GGUF",
+                repository: "cstr/mimo-asr-GGUF",
+                backend: "GGUF",
+                supportedLanguages: LanguageDictionary.forProvider(isMultilingual: true, provider: .ggufASR)
+            ),
+
             // Local Models
             WhisperModel(
                 name: "ggml-tiny",

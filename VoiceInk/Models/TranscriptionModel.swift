@@ -16,6 +16,9 @@ enum ModelProvider: String, Codable, Hashable, CaseIterable {
     case cartesia = "Cartesia"
     case custom = "Custom"
     case nativeApple = "Native Apple"
+    case huggingFaceASR = "Hugging Face ASR"
+    case mlxASR = "MLX ASR"
+    case ggufASR = "GGUF ASR"
 
     init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
@@ -97,6 +100,24 @@ struct FluidAudioModel: TranscriptionModel {
         self.ramUsage = ramUsage
         self.supportsStreaming = supportsStreaming
         self.supportedLanguages = supportedLanguages
+    }
+}
+
+struct PlannedASRModel: TranscriptionModel {
+    let id = UUID()
+    let name: String
+    let displayName: String
+    let description: String
+    let provider: ModelProvider
+    let size: String
+    let parameterCount: String
+    let precision: String
+    let repository: String
+    let backend: String
+    let supportedLanguages: [String: String]
+
+    var isMultilingualModel: Bool {
+        supportedLanguages.count > 1
     }
 }
 
